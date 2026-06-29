@@ -1,126 +1,126 @@
-const Post = require("../models/Post");
+  const Post = require("../models/Post");
 
-// Create Post
-const createPost = async (req, res) => {
-  try {
-    const { title, content } = req.body;
+  // Create Post
+  const createPost = async (req, res) => {
+    try {
+      const { title, content } = req.body;
 
-    const post = await Post.create({
-      title,
-      content,
-      author: req.user,
-    });
+      const post = await Post.create({
+        title,
+        content,
+        author: req.user,
+      });
 
-    res.status(201).json(post);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-// Get All Posts
-const getPosts = async (req, res) => {
-  try {
-    const posts = await Post.find()
-      .populate("author", "name email")
-      .sort({ createdAt: -1 });
-
-    res.json(posts);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-// Get Single Post
-const getPostById = async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id)
-      .populate("author", "name email");
-
-    if (!post) {
-      return res.status(404).json({
-        message: "Post not found",
+      res.status(201).json(post);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
       });
     }
+  };
 
-    res.json(post);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+  // Get All Posts
+  const getPosts = async (req, res) => {
+    try {
+      const posts = await Post.find()
+        .populate("author", "name email")
+        .sort({ createdAt: -1 });
 
-// Update Post
-const updatePost = async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-
-    if (!post) {
-      return res.status(404).json({
-        message: "Post not found",
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
       });
     }
+  };
 
-    // Allow only author to edit
-    if (post.author.toString() !== req.user) {
-      return res.status(403).json({
-        message: "You can edit only your own posts.",
+  // Get Single Post
+  const getPostById = async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id)
+        .populate("author", "name email");
+
+      if (!post) {
+        return res.status(404).json({
+          message: "Post not found",
+        });
+      }
+
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
       });
     }
+  };
 
-    post.title = req.body.title || post.title;
-    post.content = req.body.content || post.content;
+  // Update Post
+  const updatePost = async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id);
 
-    const updatedPost = await post.save();
+      if (!post) {
+        return res.status(404).json({
+          message: "Post not found",
+        });
+      }
 
-    res.json(updatedPost);
+      // Allow only author to edit
+      if (post.author.toString() !== req.user) {
+        return res.status(403).json({
+          message: "You can edit only your own posts.",
+        });
+      }
 
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+      post.title = req.body.title || post.title;
+      post.content = req.body.content || post.content;
 
-// Delete Post
-const deletePost = async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
+      const updatedPost = await post.save();
 
-    if (!post) {
-      return res.status(404).json({
-        message: "Post not found",
+      res.json(updatedPost);
+
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
       });
     }
+  };
 
-    // Allow only author to delete
-    if (post.author.toString() !== req.user) {
-      return res.status(403).json({
-        message: "You can delete only your own posts.",
+  // Delete Post
+  const deletePost = async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id);
+
+      if (!post) {
+        return res.status(404).json({
+          message: "Post not found",
+        });
+      }
+
+      // Allow only author to delete
+      if (post.author.toString() !== req.user) {
+        return res.status(403).json({
+          message: "You can delete only your own posts.",
+        });
+      }
+
+      await post.deleteOne();
+
+      res.json({
+        message: "Post deleted successfully",
+      });
+
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
       });
     }
+  };
 
-    await post.deleteOne();
-
-    res.json({
-      message: "Post deleted successfully",
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-module.exports = {
-  createPost,
-  getPosts,
-  getPostById,
-  updatePost,
-  deletePost,
-};
+  module.exports = {
+    createPost,
+    getPosts,
+    getPostById,
+    updatePost,
+    deletePost,
+  };

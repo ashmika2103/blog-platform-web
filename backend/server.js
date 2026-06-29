@@ -23,7 +23,7 @@ app.use("/api/comments", require("./routes/commentRoutes"));
 
 // Default Route
 app.get("/", (req, res) => {
-  res.send("Blog Platform API Running 🚀");
+  res.send("Blog Platform API Running ");
 });
 
 // Handle Invalid Routes
